@@ -132,6 +132,9 @@ Run selected code or current line with ⌘/Ctrl-Enter; run the entire file with 
 
 :::{.column-page-inset-right}
 ```{.pyterminal style="height:350px;"}
+def add(a, b):
+    return a + b
+
 sums = map(add, [1, 2, 3], [4, 5, 6])
 list(sums)
 
