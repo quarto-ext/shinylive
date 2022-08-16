@@ -13,7 +13,7 @@ To display the code editor with live running Shiny app, use a code block with `{
 
 
 :::{.column-page-inset-right}
-```{.pyshiny}
+```{shinyapp-py}
 from shiny import *
 
 app_ui = ui.page_fluid(
