@@ -7,12 +7,12 @@ project:
     - scripts/post-render.py
 
 website:
-  title: "PyShiny Quarto"
+  title: "Quarto + Shinylive"
   navbar:
     search: true
     right:
       - icon: github
-        href: https://github.com/rstudio/py-shiny/
+        href: https://shiny.rstudio.com/py/
 
 format:
   html:
