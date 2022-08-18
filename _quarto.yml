@@ -3,8 +3,6 @@ project:
   output-dir: docs
   render:
     - /index.qmd
-  post-render:
-    - scripts/post-render.py
 
 website:
   title: "Quarto + Shinylive"

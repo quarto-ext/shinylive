@@ -1,9 +1,6 @@
 ---
 title: Shiny for Python components in Quarto
-format:
-  html:
-    include-in-header: quarto-header.html
-    css: quarto-style.css
+format: html
 ---
 
 
@@ -34,7 +31,7 @@ app = App(app_ui, server)
 
 #### Vertically stacked components
 
-```{.pyshiny}
+```{shinyapp-py}
 #| layout: vertical
 #| viewerHeight: 300
 
@@ -62,7 +59,7 @@ For apps that have multiple files, you can mark the start of each file with `## 
 Binary files can be used with `## type: binary`, and the file must be base64-encoded. This can be done with the `base64` command line tool.
 
 
-```{.pyshiny}
+```{shinyapp-py}
 #| layout: vertical
 #| viewerHeight: 300
 ## file: app.py
