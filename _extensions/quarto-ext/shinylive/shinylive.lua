@@ -22,6 +22,7 @@ function getShinyliveBaseDeps(pathPrefix)
       projectOffset .. "/serviceworker.js"
     )
   end
+  -- TODO: This should be moved out of this function.
   -- Add meta tag to tell load-serviceworker.js where to find serviceworker.js.
   quarto.doc.addHtmlDependency({
     name = "shinylive-serviceworker",
@@ -99,6 +100,7 @@ end
 
 
 --------------------------------------------------------------------------------
+local baseDep = nil
 
 return {
   {
@@ -107,8 +109,8 @@ return {
       -- ln -s ~/Library/Caches/shiny/shinylive/shinylive-0.0.2dev _extensions/quarto-ext/shinylive/shinylive
       codeblockScript = quarto.utils.resolvePath("shinylive-dist/scripts/codeblock-to-json.js")
 
-      local baseDep = getShinyliveBaseDeps("shinylive-dist/")
-      quarto.doc.addHtmlDependency(baseDep)
+      baseDep = getShinyliveBaseDeps("shinylive-dist/")
+      -- quarto.doc.addHtmlDependency(baseDep)
 
       return doc
     end
@@ -133,15 +135,28 @@ return {
           temp_codeblock_file .. " " .. temp_json_file,"w")
         p:close()
 
-        -- Run `shiny static` with these contents
-        -- local p = io.popen("python3 -c 'import importlib; sl = importlib.import_module(\"_extensions.quarto-ext.shinylive.shinylive-dist.scripts.shinylive\"); sl._copy_pyodide_deps(\"tmp_json.json\", \"docs\")'", "r")
-        -- local file_list = p:read("*a")
-        -- p:close()
+        -- Find dependencies
+        local p = io.popen("python3 -c 'import importlib; sl = importlib.import_module(\"_extensions.quarto-ext.shinylive.shinylive-dist.scripts.shinylive\"); sl._get_pyodide_deps(\"tmp_json.json\", \"docs\")'", "r")
+        local file_list_json = p:read("*a")
+        local file_list = quarto.json.decode(file_list_json)
+        p:close()
 
-        -- print("-------------------")
+        print("-------------------")
         -- print(file_list)
-        -- print("-------------------")
+        quarto.utils.dump(file_list)
 
+        print("-------------------")
+
+        -- TODO: Each package should be added as a separate HTML dependency
+        -- object, instead of adding to baseDep. However, this will require some
+        -- changes to Quarto to allow putting them all into the same directory.
+        for idx, filename in ipairs(file_list) do
+          baseDep.resources[#baseDep.resources + 1] = {
+            -- TODO: Don't hard code these path - provide from python.
+            name = "shinylive/pyodide/" .. filename,
+            path = "shinylive-dist/shinylive/pyodide/" .. filename,
+          }
+        end
 
         os.remove(temp_codeblock_file)
         os.remove(temp_json_file)
@@ -151,6 +166,17 @@ return {
         return el
       end
     end
+  },
+  {
+    Pandoc = function (doc)
+
+      if baseDep ~= nil then
+        quarto.utils.dump(baseDep)
+        quarto.doc.addHtmlDependency(baseDep)
+      end
+      return doc
+    end
+
   -- },
   -- {
   --   Meta = function(meta)
