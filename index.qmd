@@ -10,7 +10,7 @@ To display the code editor with live running Shiny app, use a code block with `{
 
 
 :::{.column-page-inset-right}
-```{shinyapp-py}
+```{shinyapp-python}
 from shiny import *
 
 app_ui = ui.page_fluid(
@@ -32,6 +32,7 @@ app = App(app_ui, server)
 #### Vertically stacked components
 
 ```{shinyapp-py}
+#| editor: false
 #| layout: vertical
 #| viewerHeight: 300
 

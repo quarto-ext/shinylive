@@ -6,7 +6,7 @@ project:
   resources:
     # Need to tell it to copy over the Shinylive serviceworker. Hopefully in the
     # future this won't be needed.
-    - /serviceworker.js
+    - /shinylive-sw.js
 
 website:
   title: "Quarto + Shinylive"
