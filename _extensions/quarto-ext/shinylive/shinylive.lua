@@ -23,17 +23,18 @@ function getShinyliveBaseDeps(pathPrefix)
     "scripts/codeblock%-to%-json.js%s*$",
     "shinylive-sw.js"
   )
-  copyFile(
-    shinylive_sw_js_path,
-    projectOffset .. "/shinylive-sw.js"
-  )
 
   -- TODO: This should be moved out of this function.
+  --       This function should return deps. Also, get base-package-deps here.
   quarto.doc.addHtmlDependency({
     name = "shinylive-serviceworker",
     version = "0.0.1",
     -- Add meta tag to tell load-shinylive-sw.js where to find shinylive-sw.js.
-    meta = { ["shinylive:serviceworker_dir"] = projectOffset }
+    meta = { ["shinylive:serviceworker_dir"] = projectOffset },
+    serviceworkers = {{
+      source = shinylive_sw_js_path,
+      destination = "/shinylive-sw.js"
+    }}
   })
   -- dep["meta"] = { ["shinylive:serviceworker_dir"] = projectOffset }
 
