@@ -31,7 +31,7 @@ app = App(app_ui, server)
 
 #### Vertically stacked components
 
-```{shinyapp-py}
+```{shinyapp-python}
 #| editor: false
 #| layout: vertical
 #| viewerHeight: 300
@@ -60,7 +60,7 @@ For apps that have multiple files, you can mark the start of each file with `## 
 Binary files can be used with `## type: binary`, and the file must be base64-encoded. This can be done with the `base64` command line tool.
 
 
-```{shinyapp-py}
+```{shinyapp-python}
 #| layout: vertical
 #| viewerHeight: 300
 ## file: app.py
