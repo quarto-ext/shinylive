@@ -6,11 +6,12 @@ format: html
 
 ### Editor with app
 
-To display the code editor with live running Shiny app, use a code block with `{.pyshiny}`.
-
+To display the code editor with live running Shiny app, use a code block with `{shinylive-python}`.
 
 :::{.column-page-inset-right}
-```{shinyapp-python}
+```{shinylive-python}
+#| standalone: true
+
 from shiny import *
 
 app_ui = ui.page_fluid(
@@ -31,8 +32,8 @@ app = App(app_ui, server)
 
 #### Vertically stacked components
 
-```{shinyapp-python}
-#| editor: false
+```{shinylive-python}
+#| standalone: true
 #| layout: vertical
 #| viewerHeight: 300
 
@@ -60,9 +61,10 @@ For apps that have multiple files, you can mark the start of each file with `## 
 Binary files can be used with `## type: binary`, and the file must be base64-encoded. This can be done with the `base64` command line tool.
 
 
-```{shinyapp-python}
+```{shinylive-python}
+#| standalone: true
+#| components: [editor, viewer]
 #| layout: vertical
-#| viewerHeight: 300
 ## file: app.py
 from pathlib import Path
 from shiny import *
@@ -103,9 +105,13 @@ iVBORw0KGgoAAAANSUhEUgAAACgAAAAuCAYAAABap1twAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
 
 ### Standalone app
 
-Shiny app running in an iframe, without an editor panel. Note that the height is currently set with a `style` attribute, instead of with `#| viewerHeight: 180`. This will change in the future.
+Shiny app running in an iframe, without an editor panel.
 
-```{.pyshinyapp style="height:180px;"}
+```{shinylive-python}
+#| standalone: true
+#| appMode: viewer
+#| viewerHeight: 180
+## file: app.py
 from shiny import *
 
 app_ui = ui.page_fluid(
@@ -129,7 +135,9 @@ app = App(app_ui, server)
 Run selected code or current line with ⌘/Ctrl-Enter; run the entire file with ⌘/Ctrl-Shift-Enter.
 
 :::{.column-page-inset-right}
-```{.pyterminal style="height:350px;"}
+```{shinylive-python}
+#| components: [editor, terminal]
+
 def add(a, b):
     return a + b
 
@@ -138,3 +146,16 @@ list(sums)
 
 ```
 :::
+
+
+### Notebook-style cell
+
+
+```{shinylive-python}
+#| components: [editor, cell]
+def add(a, b):
+    return a + b
+
+list(map(add, [2, 3], [4, 5]))
+```
+
