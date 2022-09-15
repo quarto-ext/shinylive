@@ -35,19 +35,22 @@ return {
   },
   {
     CodeBlock = function(el)
-      if el.attr and el.attr.classes:includes("{shinyapp-python}") then
+      if el.attr and el.attr.classes:includes("{shinylive-python}") then
         -- Convert code block to JSON string in the same format as app.json.
-        local appJson = pandoc.pipe(
+        local parsedCodeblockJson = pandoc.pipe(
           "deno",
           { "run", codeblockScript },
           el.text
         )
 
+        -- This contains "files" and "quartoArgs" keys.
+        local parsedCodeblock = quarto.json.decode(parsedCodeblockJson)
+
         -- Find Python package dependencies for the current app.
         local appDepsJson = pandoc.pipe(
           "shinylive",
           { "package-deps" },
-          appJson
+          quarto.json.encode(parsedCodeblock["files"])
         )
 
         local appDeps = quarto.json.decode(appDepsJson)
@@ -57,7 +60,7 @@ return {
         end
 
         el.attr.classes = pandoc.List()
-        el.attr.classes:insert("pyshiny")
+        el.attr.classes:insert("shinylive-python")
         return el
       end
     end
