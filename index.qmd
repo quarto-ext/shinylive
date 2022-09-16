@@ -1,6 +1,8 @@
 ---
 title: Shiny for Python components in Quarto
 format: html
+filters:
+  - shinylive
 ---
 
 

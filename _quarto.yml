@@ -15,6 +15,3 @@ website:
 format:
   html:
     toc: true
-
-filters:
-  - shinylive
