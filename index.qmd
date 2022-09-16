@@ -131,6 +131,9 @@ app = App(app_ui, server)
 
 ```
 
+## Components that use Pyodide but not Shinylive
+
+The components below don't use Shinylive, but they do use the Shinylive codebase to load Pyodide and run Python code in the browser.
 
 ### Editor and terminal
 

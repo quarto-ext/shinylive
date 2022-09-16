@@ -10,7 +10,7 @@ website:
     search: true
     right:
       - icon: github
-        href: https://shiny.rstudio.com/py/
+        href: https://github.com/wch/shinylive-quarto
 
 format:
   html:
