@@ -1,4 +1,32 @@
+local hasDoneShinyliveSetup = false
 local codeblockScript = nil
+
+
+-- Do one-time setup when a Shinylive codeblock is encountered.
+function ensureShinyliveSetup()
+  if hasDoneShinyliveSetup then
+    return
+  end
+  hasDoneShinyliveSetup = true
+
+  -- Find the path to codeblock-to-json.ts and save it for later use.
+  codeblockScript = pandoc.pipe("shinylive", { "codeblock-to-json-path" }, "")
+  -- Remove trailing whitespace
+  codeblockScript = codeblockScript:gsub("%s+$", "")
+
+  local baseDeps = getShinyliveBaseDeps()
+  for idx, dep in ipairs(baseDeps) do
+    quarto.doc.addHtmlDependency(dep)
+  end
+
+  quarto.doc.addHtmlDependency(
+    {
+      name = "shinylive-quarto-css",
+      stylesheets = {"resources/css/shinylive-quarto.css"}
+    }
+  )
+end
+
 
 function getShinyliveBaseDeps()
   -- Relative path from the current page to the root of the site. This is needed
@@ -12,30 +40,10 @@ end
 
 return {
   {
-    Pandoc = function (doc)
-      -- Find the path to codeblock-to-json.ts and save it for later use.
-      codeblockScript = pandoc.pipe("shinylive", { "codeblock-to-json-path" }, "")
-      -- Remove trailing whitespace
-      codeblockScript = codeblockScript:gsub("%s+$", "")
-
-      local baseDeps = getShinyliveBaseDeps()
-      for idx, dep in ipairs(baseDeps) do
-        quarto.doc.addHtmlDependency(dep)
-      end
-
-      quarto.doc.addHtmlDependency(
-        {
-          name = "shinylive-quarto-css",
-          stylesheets = {"resources/css/shinylive-quarto.css"}
-        }
-      )
-
-      return doc
-    end
-  },
-  {
     CodeBlock = function(el)
       if el.attr and el.attr.classes:includes("{shinylive-python}") then
+        ensureShinyliveSetup()
+
         -- Convert code block to JSON string in the same format as app.json.
         local parsedCodeblockJson = pandoc.pipe(
           "deno",
