@@ -30,8 +30,7 @@ jobs:
         run: python -m pip install --upgrade pip
 
       - name: Install shinylive
-        # run: pip install shinylive
-        run: pip install https://github.com/rstudio/py-shinylive/tarball/main
+        run: pip install shinylive
 
       - name: Build Quarto site
         run: quarto render

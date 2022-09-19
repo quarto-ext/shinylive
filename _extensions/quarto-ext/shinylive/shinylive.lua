@@ -37,7 +37,7 @@ function getShinyliveBaseDeps()
     { "base-deps", "--sw-dir", projectOffset },
     ""
   )
-  print(depJson)
+
   local deps = quarto.json.decode(depJson)
   return deps
 end
@@ -65,7 +65,6 @@ return {
           { "package-deps" },
           quarto.json.encode(parsedCodeblock["files"])
         )
-        print(appDepsJson)
 
         local appDeps = quarto.json.decode(appDepsJson)
 
