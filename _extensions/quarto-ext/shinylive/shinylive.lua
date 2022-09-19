@@ -51,7 +51,7 @@ return {
 
         -- Convert code block to JSON string in the same format as app.json.
         local parsedCodeblockJson = pandoc.pipe(
-          "deno",
+          "quarto",
           { "run", codeblockScript },
           el.text
         )
