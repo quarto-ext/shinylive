@@ -65,6 +65,7 @@ return {
           { "package-deps" },
           quarto.json.encode(parsedCodeblock["files"])
         )
+        print(appDepsJson)
 
         local appDeps = quarto.json.decode(appDepsJson)
 
