@@ -30,6 +30,9 @@ jobs:
       - name: Install shinylive
         run: pip install shinylive
 
+      - name: Download shinylive web assets
+        run: shinylive assets download
+
       - name: Build Quarto site
         run: quarto render
 
