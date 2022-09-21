@@ -3,16 +3,18 @@ Shinylive Quarto extension
 
 This extension lets you embed [Shinylive](https://shiny.rstudio.com/py/docs/shinylive.html) applications in a Quarto document.
 
-Example:
-* [Qmd source document](index.qmd)
-* The [website](https://wch.github.io/shinylive-quarto/) rendered from the Qmd document.
+This repository contains an example Quarto document which uses this extension:
+
+* The [example document](index.qmd)
+* The [rendered website](https://wch.github.io/shinylive-quarto/)
+
 
 ## Installation
 
 Prerequisites:
-* A pre-release version of Quarto, version (1.2.x). You can download it [here](https://quarto.org/docs/download/).
+* A pre-release version of Quarto (version 1.2.x). You can download it [here](https://quarto.org/docs/download/).
 * Python 3.8 or above.
-* The `shinylive` Python package, which can be installed with:
+* The [`shinylive`](https://github.com/rstudio/py-shinylive) Python package, which can be installed with:
     ```
     pip install shinylive
     ```
