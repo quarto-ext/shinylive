@@ -1,5 +1,5 @@
 ---
-title: Shiny for Python components in Quarto
+title: Shinylive applications embedded in Quarto documents
 format: html
 filters:
   - shinylive
