@@ -130,37 +130,3 @@ def server(input, output, session):
 app = App(app_ui, server)
 
 ```
-
-## Components that use Pyodide but not Shinylive
-
-The components below don't use Shinylive, but they do use the Shinylive codebase to load Pyodide and run Python code in the browser.
-
-### Editor and terminal
-
-Run selected code or current line with ⌘/Ctrl-Enter; run the entire file with ⌘/Ctrl-Shift-Enter.
-
-:::{.column-page-inset-right}
-```{shinylive-python}
-#| components: [editor, terminal]
-
-def add(a, b):
-    return a + b
-
-sums = map(add, [1, 2, 3], [4, 5, 6])
-list(sums)
-
-```
-:::
-
-
-### Notebook-style cell
-
-
-```{shinylive-python}
-#| components: [editor, cell]
-def add(a, b):
-    return a + b
-
-list(map(add, [2, 3], [4, 5]))
-```
-
