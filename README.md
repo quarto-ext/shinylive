@@ -6,7 +6,7 @@ This extension lets you embed [Shinylive](https://shiny.rstudio.com/py/docs/shin
 This repository contains an example Quarto document which uses this extension:
 
 * The [example document](index.qmd)
-* The [rendered website](https://wch.github.io/shinylive-quarto/)
+* The [rendered website](https://quarto-ext.github.io/shinylive/)
 
 
 ## Installation
@@ -22,7 +22,7 @@ Prerequisites:
 To use this extension in your Quarto project, run this in the top level of your Quarto project:
 
 ```bash
-quarto install extension quarto-ext/shinylive-quarto
+quarto install extension quarto-ext/shinylive
 ```
 
 This will install the extension under the `_extensions/` subdirectory. If you're using version control, you will want to check in this directory.
