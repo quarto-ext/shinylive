@@ -10,7 +10,7 @@ website:
     search: true
     right:
       - icon: github
-        href: https://github.com/wch/shinylive-quarto
+        href: https://github.com/quarto-ext/shinylive-quarto
 
 format:
   html:
