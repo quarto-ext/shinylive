@@ -3,6 +3,8 @@ Shinylive Quarto extension
 
 This extension lets you embed [Shinylive](https://shiny.rstudio.com/py/docs/shinylive.html) applications in a Quarto document. These are [Shiny for Python](https://shiny.rstudio.com/py/) applications which run completely in the browser, using [Pyodide](https://pyodide.org/) (Python compiled to WebAssembly).
 
+:warning: Requires Quarto Version 1.2.x :warning:
+
 Screenshot:
 
 ![Embedded Shinylive application](embedded-app.png)
