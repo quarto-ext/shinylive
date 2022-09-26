@@ -9,6 +9,9 @@ This repository contains an example Quarto document which uses this extension:
 * The [rendered website](https://quarto-ext.github.io/shinylive/)
 
 
+ ![Embedded Shinylive application](embedded-app.png)
+
+
 ## Installation
 
 Prerequisites:
@@ -76,12 +79,28 @@ Note that the code block currently must have `#| standalone: true`, which indica
 
 ### Other options
 
-By default, the application will have an editor panel on the left and the application viewer panel on the right. They can be arranged vertically, with the editor above the app viewer, with:
+
+By default, a Shinylive code block will run the application by itself. It is also possible to also display the code in an editor. The editor is "live" -- it allows the user can make changes to the code and re-run the application.
+
+To do this, you need to tell it which `components` to display:
+
+```
+#| components: [editor, viewer]
+```
+
+ ![Editor and viewer](editor-viewer.png)
+
+******
+
+When showing the editor and viewer, the default is to display the editor panel on the left and the application viewer panel on the right. They can be arranged vertically, with the editor above the app viewer, with:
 
 ```
 #| layout: vertical
 ```
 
+ ![Editor and viewer, vertical arrangement](editor-viewer-vertical.png)
+
+******
 
 The default width in a Quarto document is somewhat narrow for showing the editor and viewer next to each other. It can be made wider with [Quarto layout containers](https://quarto.org/docs/authoring/article-layout.html). For example, `column-screen-inset` will the app take up almost the whole window width:
 
@@ -94,16 +113,3 @@ The default width in a Quarto document is somewhat narrow for showing the editor
 ```
 :::
 ````
-
-
-By default, a Shinylive code block will include an editor and a viewer component. This is equivalent to:
-
-```
-#| components: [editor, viewer]
-```
-
-If you want to show just the app viewer (without code editor), you can use:
-
-```
-#| components: [viewer]
-```

@@ -1,0 +1,40 @@
+---
+title: Experimental components
+format: html
+filters:
+  - shinylive
+---
+
+The components below don't contain Shiny applications, but they do use Shinylive to load Pyodide and run Python code in the browser.
+
+Please note that these are experimental and usage may change in the future.
+
+### Editor and terminal
+
+Run selected code or current line with ⌘/Ctrl-Enter; run the entire file with ⌘/Ctrl-Shift-Enter.
+
+:::{.column-page-inset-right}
+```{shinylive-python}
+#| components: [editor, terminal]
+
+def add(a, b):
+    return a + b
+
+sums = map(add, [1, 2, 3], [4, 5, 6])
+list(sums)
+
+```
+:::
+
+
+### Notebook-style cell
+
+
+```{shinylive-python}
+#| components: [editor, cell]
+def add(a, b):
+    return a + b
+
+list(map(add, [2, 3], [4, 5]))
+```
+
