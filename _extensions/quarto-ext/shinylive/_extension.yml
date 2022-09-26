@@ -1,7 +1,8 @@
 name: shinylive
 title: Embedded Shinylive applications
 author: Winston Chang
-version: 0.0.1
+version: 0.0.2
+quarto-required: ">=1.2.124"
 contributes:
   filters:
     - shinylive.lua
