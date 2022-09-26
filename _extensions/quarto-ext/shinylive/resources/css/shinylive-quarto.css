@@ -27,3 +27,8 @@ div.shinylive-wrapper {
   font-size: 13px;
   line-height: 1.8;
 }
+
+iframe.app-frame {
+  /* Override the default margin from Bootstrap */
+  margin-bottom: 0;
+}
