@@ -32,6 +32,9 @@ function getShinyliveBaseDeps()
   -- Relative path from the current page to the root of the site. This is needed
   -- to find out where shinylive-sw.js is, relative to the current page.
   local projectOffset = param("project-offset")
+  if projectOffset == nil then
+    error("The shinylive extension must be used in a Quarto project directory (with a _quarto.yml file).")
+  end
   local depJson = pandoc.pipe(
     "shinylive",
     { "base-deps", "--sw-dir", projectOffset },
