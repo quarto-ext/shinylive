@@ -1,6 +1,24 @@
 local hasDoneShinyliveSetup = false
 local codeblockScript = nil
 
+-- Try calling `pandoc.pipe('shinylive', ...)` and if it fails, print a message
+-- about installing shinylive package.
+function callShinylive(args, input)
+  local res
+  local status, err = pcall(
+    function()
+      res = pandoc.pipe("shinylive", args, input)
+    end
+  )
+
+  if not status then
+    print(err)
+    error("Error running 'shinylive' command. Perhaps you need to install the 'shinylive' Python package?")
+  end
+
+  return res
+end
+
 
 -- Do one-time setup when a Shinylive codeblock is encountered.
 function ensureShinyliveSetup()
@@ -10,7 +28,7 @@ function ensureShinyliveSetup()
   hasDoneShinyliveSetup = true
 
   -- Find the path to codeblock-to-json.ts and save it for later use.
-  codeblockScript = pandoc.pipe("shinylive", { "codeblock-to-json-path" }, "")
+  codeblockScript = callShinylive({ "codeblock-to-json-path" }, "")
   -- Remove trailing whitespace
   codeblockScript = codeblockScript:gsub("%s+$", "")
 
@@ -35,8 +53,7 @@ function getShinyliveBaseDeps()
   if projectOffset == nil then
     error("The shinylive extension must be used in a Quarto project directory (with a _quarto.yml file).")
   end
-  local depJson = pandoc.pipe(
-    "shinylive",
+  local depJson = callShinylive(
     { "base-deps", "--sw-dir", projectOffset },
     ""
   )
@@ -63,8 +80,7 @@ return {
         local parsedCodeblock = quarto.json.decode(parsedCodeblockJson)
 
         -- Find Python package dependencies for the current app.
-        local appDepsJson = pandoc.pipe(
-          "shinylive",
+        local appDepsJson = callShinylive(
           { "package-deps" },
           quarto.json.encode(parsedCodeblock["files"])
         )

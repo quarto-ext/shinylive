@@ -20,9 +20,9 @@ This repository contains an example Quarto document which uses this extension:
 Prerequisites:
 * A pre-release version of Quarto (version 1.2.x). You can download it [here](https://quarto.org/docs/download/).
 * Python 3.8 or above.
-* The [`shinylive`](https://github.com/rstudio/py-shinylive) Python package, which can be installed with:
+* A recent version of [`shinylive`](https://github.com/rstudio/py-shinylive) Python package, which can be installed with:
     ```
-    pip install shinylive
+    pip install shinylive --upgrade
     ```
 
 To use this extension in your Quarto project, run this in the top level of your Quarto project:
