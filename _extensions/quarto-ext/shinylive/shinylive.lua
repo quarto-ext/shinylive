@@ -34,10 +34,10 @@ function ensureShinyliveSetup()
 
   local baseDeps = getShinyliveBaseDeps()
   for idx, dep in ipairs(baseDeps) do
-    quarto.doc.addHtmlDependency(dep)
+    quarto.doc.add_html_dependency(dep)
   end
 
-  quarto.doc.addHtmlDependency(
+  quarto.doc.add_html_dependency(
     {
       name = "shinylive-quarto-css",
       stylesheets = {"resources/css/shinylive-quarto.css"}
@@ -87,7 +87,7 @@ return {
         local appDeps = quarto.json.decode(appDepsJson)
 
         for idx, dep in ipairs(appDeps) do
-          quarto.doc.attachToDependency("shinylive", dep)
+          quarto.doc.attach_to_dependency("shinylive", dep)
         end
 
         el.attr.classes = pandoc.List()
