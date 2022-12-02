@@ -18,7 +18,7 @@ This repository contains an example Quarto document which uses this extension:
 ## Installation
 
 Prerequisites:
-* A pre-release version of Quarto (version 1.2.x). You can download it [here](https://quarto.org/docs/download/).
+* Quarto. You can download it [here](https://quarto.org/docs/download/).
 * Python 3.8 or above.
 * A recent version of [`shinylive`](https://github.com/rstudio/py-shinylive) Python package, which can be installed with:
     ```
