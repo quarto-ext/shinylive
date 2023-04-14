@@ -103,6 +103,36 @@ When showing the editor and viewer, the default is to display the editor panel o
 
 ******
 
+If you want to have multiple files in your application, you can use `## file: filename` to indicate the start of each file. This can be used for any type of file, including `.py`, `.csv`, `requirements.txt`, or even binary files.
+
+````markdown
+```{shinylive-python}
+#| standalone: true
+#| components: [editor, viewer]
+## file: app.py
+from shiny import App, ui render
+from utils import square
+
+# [App code here...]
+
+## file: utils.py
+
+def square(x, n):
+    row = ui.div([x] * n)
+    return ui.div([row] * n)
+
+## file: requirements.txt
+shinyswatch
+
+## file: www/logo.png
+## type: binary
+iVBORw0KGgoAAAANSUhEUgAAACgAAA ...
+```
+
+````
+
+******
+
 The default width in a Quarto document is somewhat narrow for showing the editor and viewer next to each other. It can be made wider with [Quarto layout containers](https://quarto.org/docs/authoring/article-layout.html). For example, `column-screen-inset` will the app take up almost the whole window width:
 
 ````markdown
