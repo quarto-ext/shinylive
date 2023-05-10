@@ -5,7 +5,7 @@ This extension lets you embed [Shinylive](https://shiny.rstudio.com/py/docs/shin
 
 Screenshot:
 
-![Embedded Shinylive application](embedded-app.png)
+[![Embedded Shinylive application](embedded-app.png)](https://quarto-ext.github.io/shinylive/sine.html)
 
 This repository contains an example Quarto document which uses this extension:
 
