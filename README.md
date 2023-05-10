@@ -9,8 +9,8 @@ Screenshot:
 
 This repository contains an example Quarto document which uses this extension:
 
-* The [example document](index.qmd)
-* The [rendered website](https://quarto-ext.github.io/shinylive/)
+* Usage example: [source](index.qmd) | [rendered web page](https://quarto-ext.github.io/shinylive/)
+* Sine wave example: [source](sine.qmd) | [rendered web page](https://quarto-ext.github.io/shinylive/sine.html)
 
 
 ## Installation
