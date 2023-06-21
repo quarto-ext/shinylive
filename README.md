@@ -91,6 +91,10 @@ To do this, you need to tell it which `components` to display:
 
  ![Editor and viewer](editor-viewer.png)
 
+
+By default, it will just display the app `viewer`, without the code `editor`.
+
+
 ******
 
 When showing the editor and viewer, the default is to display the editor panel on the left and the application viewer panel on the right. They can be arranged vertically, with the editor above the app viewer, with:
@@ -100,6 +104,15 @@ When showing the editor and viewer, the default is to display the editor panel o
 ```
 
  ![Editor and viewer, vertical arrangement](editor-viewer-vertical.png)
+
+
+******
+
+You can control the height of the panel by setting `viewerHeight`:
+
+```
+#| viewerHeight: 420
+```
 
 ******
 
