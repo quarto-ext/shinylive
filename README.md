@@ -26,7 +26,7 @@ Prerequisites:
 To use this extension in your Quarto project, run this in the top level of your Quarto project:
 
 ```bash
-quarto install extension quarto-ext/shinylive
+quarto add quarto-ext/shinylive
 ```
 
 This will install the extension under the `_extensions/` subdirectory. If you're using version control, you will want to check in this directory.
