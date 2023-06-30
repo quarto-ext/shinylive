@@ -11,6 +11,7 @@ This repository contains an example Quarto document which uses this extension:
 
 * Usage example: [source](index.qmd) | [rendered web page](https://quarto-ext.github.io/shinylive/)
 * Sine wave example: [source](sine.qmd) | [rendered web page](https://quarto-ext.github.io/shinylive/sine.html)
+* File-loading example: [source](load_file.qmd) | [rendered web page]https://quarto-ext.github.io/shinylive/load_file.html
 
 
 ## Installation
@@ -143,6 +144,11 @@ iVBORw0KGgoAAAANSUhEUgAAACgAAA ...
 ```
 
 ````
+
+******
+
+If you want an application which loads data files, you can either embed them in the application with `## file: xyz.dat`, or you can add the file as a separate file in the web site, and load it via a URL. See the [file-loading example](https://quarto-ext.github.io/shinylive/load_file.html) ([source](load_file.qmd)) for an example of how to do this.
+
 
 ******
 
