@@ -1,0 +1,128 @@
+---
+title: Loading files in Shinylive apps in Quarto
+format: html
+filters:
+  - shinylive
+resources:
+  - fruit_data.csv
+---
+
+
+The following application shows three different ways of adding files to a Shinylive app embedded in a Quarto document.
+
+The first is a text file embedded in the code block, like this:
+
+```{{shinylive-python}}
+## file: fruit.csv
+id,name,count
+1,"apple",20
+2,"orange",12
+3,"grape",100
+```
+
+The second is a binary file embedded in the code block.
+
+```{{shinylive-python}}
+## file: fruit.pickle
+## type: binary
+gASVVAAAAAAAAABdlCh9lCiMAmlklEsEjARuYW1llIwEcGVhcpSMBWNvdW50lEsIdX2UKGgCSwVoA4wGYmFuYW5hlGgFSwZ1fZQoaAJLBmgDjARwbHVtlGgFSwt1ZS4=
+```
+
+
+The third is a text file that is deployed as part of the Quarto-generated website, and loaded via http request, by using `pyodide.http.pyfetch()`. Note that `pyodide.http.pyfetch()` will only work in Shinylive; a normal Shiny deployment will not have `pyodide` available. If you want to abstract the code so that you can use the same function in both normal Shiny and Shinylive, see the `get_url()` function in this [download demo app](https://shinylive.io/py/examples/#fetch-data-from-a-web-api).
+
+
+```{shinylive-python}
+#| standalone: true
+#| components: [editor, viewer]
+#| layout: vertical
+#| viewerHeight: 400
+## file: app.py
+from pathlib import Path
+from os.path import dirname
+import pickle as pkl
+from shiny import App, render, ui, Inputs, Outputs, Session
+
+appdir = Path(__file__).parent
+
+app_ui = ui.page_fluid(
+    ui.row(
+        ui.h4("Embedded CSV:"),
+        ui.output_text_verbatim("embedded_csv"),
+        ui.h4("Embedded pickle file:"),
+        ui.output_text_verbatim("embedded_pickle"),
+        ui.h4("Downloaded CSV:"),
+        ui.output_text_verbatim("download_csv"),
+    )
+)
+
+
+def server(input: Inputs, output: Outputs, session: Session):
+    @output
+    @render.text
+    def embedded_csv():
+        with open(appdir / "fruit.csv", "r") as file:
+            content = file.read()
+        return content
+
+    @output
+    @render.text
+    def embedded_pickle():
+        with open(appdir / "fruit.pickle", "rb") as file:
+            data = pkl.load(file)
+        return str(data)
+
+    @output
+    @render.text
+    async def download_csv():
+        file_url = dirname(dirname(get_current_url(input))) + "/fruit_data.csv"
+        resp = await fetch_url(file_url)
+        return str(resp)
+
+
+app = App(app_ui, server)
+
+
+def get_current_url(input: Inputs) -> str:
+    return (
+        input[".clientdata_url_protocol"]()
+        + "//"
+        + input[".clientdata_url_hostname"]()
+        + ":"
+        + input[".clientdata_url_port"]()
+        + input[".clientdata_url_pathname"]()
+    )
+
+
+async def fetch_url(url: str, type: str = "string"):
+    import pyodide.http
+
+    response = await pyodide.http.pyfetch(url)
+
+    if type == "json":
+        # .json() parses the response as JSON and converts to dictionary.
+        return await response.json()
+    elif type == "string":
+        # .string() returns the response as a string.
+        return await response.string()
+    elif type == "bytes":
+        # .bytes() returns the response as a byte object.
+        return await response.bytes()
+    else:
+        return None
+
+## file: fruit.csv
+id,name,count
+1,"apple",20
+2,"orange",12
+3,"grape",100
+
+## file: fruit.pickle
+## type: binary
+gASVVAAAAAAAAABdlCh9lCiMAmlklEsEjARuYW1llIwEcGVhcpSMBWNvdW50lEsIdX2UKGgCSwVoA4wGYmFuYW5hlGgFSwZ1fZQoaAJLBmgDjARwbHVtlGgFSwt1ZS4=
+```
+
+
+
+
+
