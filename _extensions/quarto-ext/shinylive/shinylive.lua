@@ -65,7 +65,10 @@ end
 return {
   {
     CodeBlock = function(el)
-      if el.attr and el.attr.classes:includes("{shinylive-python}") then
+      if el.attr and (
+        el.attr.classes:includes("{shinylive-python}")
+        or el.attr.classes:includes("{shinylive-r}")
+     ) then
         ensureShinyliveSetup()
 
         -- Convert code block to JSON string in the same format as app.json.
@@ -90,8 +93,15 @@ return {
           quarto.doc.attach_to_dependency("shinylive", dep)
         end
 
-        el.attr.classes = pandoc.List()
-        el.attr.classes:insert("shinylive-python")
+        if el.attr.classes:includes("{shinylive-python}") then
+          el.attributes.engine = "python"
+          el.attr.classes = pandoc.List()
+          el.attr.classes:insert("shinylive-python")
+        elseif el.attr.classes:includes("{shinylive-r}") then
+          el.attributes.engine = "r"
+          el.attr.classes = pandoc.List()
+          el.attr.classes:insert("shinylive-r")
+        end
         return el
       end
     end
