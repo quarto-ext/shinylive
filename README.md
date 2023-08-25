@@ -11,8 +11,7 @@ This repository contains an example Quarto document which uses this extension:
 
 * Usage example: [source](index.qmd) | [rendered web page](https://quarto-ext.github.io/shinylive/)
 * Sine wave example: [source](sine.qmd) | [rendered web page](https://quarto-ext.github.io/shinylive/sine.html)
-* File-loading example: [source](load_file.qmd) | [rendered web page]https://quarto-ext.github.io/shinylive/load_file.html
-
+* File-loading example: [source](load_file.qmd) | [rendered web page](https://quarto-ext.github.io/shinylive/load_file.html)
 
 ## Installation
 
