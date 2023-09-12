@@ -96,50 +96,54 @@ end
 return {
   {
     CodeBlock = function(el)
-      if el.attr and (
-            el.attr.classes:includes("{shinylive-python}")
-            or el.attr.classes:includes("{shinylive-r}")
-          ) then
-        local language = "python"
-        if el.attr.classes:includes("{shinylive-r}") then
-          language = "r"
-        end
-        ensureShinyliveSetup(language)
-
-        -- Convert code block to JSON string in the same format as app.json.
-        local parsedCodeblockJson = pandoc.pipe(
-          "quarto",
-          { "run", codeblockScript },
-          el.text
-        )
-
-        -- This contains "files" and "quartoArgs" keys.
-        local parsedCodeblock = quarto.json.decode(parsedCodeblockJson)
-
-        -- Find Python package dependencies for the current app.
-        local appDepsJson = callShinylive(
-          language,
-          { "package-deps" },
-          quarto.json.encode(parsedCodeblock["files"])
-        )
-
-        local appDeps = quarto.json.decode(appDepsJson)
-
-        for idx, dep in ipairs(appDeps) do
-          quarto.doc.attach_to_dependency("shinylive", dep)
-        end
-
-        if el.attr.classes:includes("{shinylive-python}") then
-          el.attributes.engine = "python"
-          el.attr.classes = pandoc.List()
-          el.attr.classes:insert("shinylive-python")
-        elseif el.attr.classes:includes("{shinylive-r}") then
-          el.attributes.engine = "r"
-          el.attr.classes = pandoc.List()
-          el.attr.classes:insert("shinylive-r")
-        end
-        return el
+      if not el.attr then
+        -- Not a shinylive codeblock, return
+        return
       end
+
+      if el.attr.classes:includes("{shinylive-r}") then
+        language = "r"
+      elseif el.attr.classes:includes("{shinylive-python}") then
+        language = "python"
+      else
+        -- Not a shinylive codeblock, return
+        return
+      end
+      ensureShinyliveSetup(language)
+
+      -- Convert code block to JSON string in the same format as app.json.
+      local parsedCodeblockJson = pandoc.pipe(
+        "quarto",
+        { "run", codeblockScript },
+        el.text
+      )
+
+      -- This contains "files" and "quartoArgs" keys.
+      local parsedCodeblock = quarto.json.decode(parsedCodeblockJson)
+
+      -- Find Python package dependencies for the current app.
+      local appDepsJson = callShinylive(
+        language,
+        { "package-deps" },
+        quarto.json.encode(parsedCodeblock["files"])
+      )
+
+      local appDeps = quarto.json.decode(appDepsJson)
+
+      for idx, dep in ipairs(appDeps) do
+        quarto.doc.attach_to_dependency("shinylive", dep)
+      end
+
+      if el.attr.classes:includes("{shinylive-python}") then
+        el.attributes.engine = "python"
+        el.attr.classes = pandoc.List()
+        el.attr.classes:insert("shinylive-python")
+      elseif el.attr.classes:includes("{shinylive-r}") then
+        el.attributes.engine = "r"
+        el.attr.classes = pandoc.List()
+        el.attr.classes:insert("shinylive-r")
+      end
+      return el
     end
   }
 }
