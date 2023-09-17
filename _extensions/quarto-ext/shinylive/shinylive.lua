@@ -23,7 +23,7 @@ end
 -- about installing shinylive R package.
 function callRShinylive(args, input)
   args = { "-e",
-    "shinylive::quarto_ext()",
+    "shinylive:::quarto_ext()",
     table.unpack(args) }
   local res
   local status, err = pcall(
