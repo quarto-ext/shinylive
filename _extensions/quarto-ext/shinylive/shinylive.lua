@@ -326,7 +326,10 @@ return {
 
       -- Add app specific dependencies
       for idx, dep in ipairs(appDeps) do
-        quarto.doc.attach_to_dependency("shinylive", dep)
+        if not appSpecificDeps[dep.name] then
+          appSpecificDeps[dep.name] = true
+          quarto.doc.attach_to_dependency("shinylive", dep)
+        end
       end
 
       if el.attr.classes:includes("{shinylive-python}") then
