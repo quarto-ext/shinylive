@@ -1,5 +1,8 @@
 local hasDoneShinyliveSetup = false
+local hasDoneSetup = { init = false, r = false, python = false }
+local versions = { r = nil, python = nil }
 local codeblockScript = nil
+local appSpecificDeps = {}
 
 -- Try calling `pandoc.pipe('shinylive', ...)` and if it fails, print a message
 -- about installing shinylive python package.
@@ -42,33 +45,65 @@ function callRShinylive(args, input)
 end
 
 function callShinylive(language, args, input)
+  if input == nil then
+    input = ""
+  end
+  local res
   -- print("Calling " .. language .. " shinylive with args: " .. table.concat(args, " "))
   if language == "python" then
-    return callPythonShinylive(args, input)
+    res = callPythonShinylive(args, input)
   elseif language == "r" then
-    return callRShinylive(args, input)
+    res = callRShinylive(args, input)
   else
     error("Unknown language: " .. language)
   end
+
+  -- Decode JSON object
+  local result
+  local status, err = pcall(
+    function()
+      result = quarto.json.decode(res)
+    end
+  )
+  if not status then
+    print("JSON string being parsed:")
+    print(res)
+    print("Error:")
+    print(err)
+    if language == "python" then
+      error("Error decoding JSON response from shinylive.")
+    elseif language == "r" then
+      error(
+        "Error decoding JSON response from shinylive." ..
+        "\nIf the `shinylive` R package has been installed," ..
+        " please check that no additional output was printed to the console."
+      )
+    end
+  end
+  return result
 end
 
--- Do one-time setup when a Shinylive codeblock is encountered.
-function ensureShinyliveSetup(language)
-  if hasDoneShinyliveSetup then
+-- Do one-time setup for language agnostic html dependencies.
+-- This should only be called once per document
+-- @param language: "python" or "r"
+function ensureInitSetup(language)
+  if hasDoneSetup.init then
     return
   end
-  hasDoneShinyliveSetup = true
+  hasDoneSetup.init = true
 
   -- Find the path to codeblock-to-json.ts and save it for later use.
-  codeblockScript = callShinylive(language, { "codeblock-to-json-path" }, "")
-  -- Remove trailing whitespace
-  codeblockScript = codeblockScript:gsub("%s+$", "")
+  local infoObj = callShinylive(language, { "extension", "info" })
+  -- Store the path to codeblock-to-json.ts for later use
+  codeblockScript = infoObj.scripts['codeblock-to-json']
 
+  -- Add language-agnostic dependencies
   local baseDeps = getShinyliveBaseDeps(language)
   for idx, dep in ipairs(baseDeps) do
     quarto.doc.add_html_dependency(dep)
   end
 
+  -- Add ext css dependency
   quarto.doc.add_html_dependency(
     {
       name = "shinylive-quarto-css",
@@ -77,19 +112,34 @@ function ensureShinyliveSetup(language)
   )
 end
 
+function ensureLanguageSetup(language)
+  ensureInitSetup(language)
+
+  if hasDoneSetup[language] then
+    return
+  end
+  hasDoneSetup[language] = true
+
+  -- Add language-specific dependencies
+  local langResources = callShinylive(language, { "extension", "language-resources" })
+  for idx, resourceDep in ipairs(langResources) do
+    -- No need to check for uniqueness.
+    -- Each resource is only be added once and should already be unique.
+    quarto.doc.attach_to_dependency("shinylive", resourceDep)
+  end
+end
+
 function getShinyliveBaseDeps(language)
   -- Relative path from the current page to the root of the site. This is needed
   -- to find out where shinylive-sw.js is, relative to the current page.
   if quarto.project.offset == nil then
     error("The shinylive extension must be used in a Quarto project directory (with a _quarto.yml file).")
   end
-  local depJson = callShinylive(
+  local deps = callShinylive(
     language,
-    { "base-deps", "--sw-dir", quarto.project.offset },
+    { "extension", "base-htmldeps", "--sw-dir", quarto.project.offset },
     ""
   )
-
-  local deps = quarto.json.decode(depJson)
   return deps
 end
 
@@ -101,6 +151,7 @@ return {
         return
       end
 
+      local language
       if el.attr.classes:includes("{shinylive-r}") then
         language = "r"
       elseif el.attr.classes:includes("{shinylive-python}") then
@@ -109,7 +160,8 @@ return {
         -- Not a shinylive codeblock, return
         return
       end
-      ensureShinyliveSetup(language)
+      -- Setup language and language-agnostic dependencies
+      ensureLanguageSetup(language)
 
       -- Convert code block to JSON string in the same format as app.json.
       local parsedCodeblockJson = pandoc.pipe(
@@ -117,19 +169,18 @@ return {
         { "run", codeblockScript },
         el.text
       )
-
       -- This contains "files" and "quartoArgs" keys.
       local parsedCodeblock = quarto.json.decode(parsedCodeblockJson)
 
       -- Find Python package dependencies for the current app.
-      local appDepsJson = callShinylive(
+      local appDeps = callShinylive(
         language,
-        { "package-deps" },
+        { "extension", "app-resources" },
+        -- Send as piped input to the shinylive command
         quarto.json.encode(parsedCodeblock["files"])
       )
 
-      local appDeps = quarto.json.decode(appDepsJson)
-
+      -- Add app specific dependencies
       for idx, dep in ipairs(appDeps) do
         quarto.doc.attach_to_dependency("shinylive", dep)
       end
