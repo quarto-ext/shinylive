@@ -237,6 +237,8 @@ function ensureInitSetup(language)
   local infoObj = callShinylive(language, { "extension", "info" })
   -- Store the path to codeblock-to-json.ts for later use
   codeblockScript = infoObj.scripts['codeblock-to-json']
+  -- Store the version info for later use
+  versions[language] = { version = infoObj.version, assets_version = infoObj.assets_version }
 
   -- Add language-agnostic dependencies
   local baseDeps = getShinyliveBaseDeps(language)
@@ -263,6 +265,32 @@ function ensureLanguageSetup(language)
     return
   end
   hasDoneSetup[language] = true
+
+  -- Only get the asset version value if it hasn't been retrieved yet.
+  if versions[language] == nil then
+    local infoObj = callShinylive(language, { "extension", "info" })
+    versions[language] = { version = infoObj.version, assets_version = infoObj.assets_version }
+  end
+  -- Verify that the r-shinylive and py-shinylive versions match
+  if
+      (versions.r and versions.python) and
+      ---@diagnostic disable-next-line: undefined-field
+      versions.r.assets_version ~= versions.python.assets_version
+  then
+    error(
+      "The shinylive R and Python packages must support the same Shinylive Assets version to be used in the same quarto document." ..
+      "\nR" ..
+      ---@diagnostic disable-next-line: undefined-field
+      "\n\tShinylive package version: " .. versions.r.version ..
+      ---@diagnostic disable-next-line: undefined-field
+      "\n\tSupported ssets version: " .. versions.r.assets_version ..
+      "\nPython" ..
+      ---@diagnostic disable-next-line: undefined-field
+      "\n\tShinylive package version: " .. versions.python.version ..
+      ---@diagnostic disable-next-line: undefined-field
+      "\n\tSupported ssets version: " .. versions.python.assets_version
+    )
+  end
 
   -- Add language-specific dependencies
   local langResources = callShinylive(language, { "extension", "language-resources" })
