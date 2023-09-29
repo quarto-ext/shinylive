@@ -176,6 +176,29 @@ function callShinylive(language, args, input)
     error("Unknown language: " .. language)
   end
 
+  -- Remove any unwanted output before the first curly brace or square bracket.
+  -- print("res: " .. string.sub(res, 1, math.min(string.len(res), 100)) .. "...")
+  local curly_start = string.find(res, "{", 0, true)
+  local brace_start = string.find(res, "[", 0, true)
+  local min_start
+  if curly_start == nil then
+    min_start = brace_start
+  elseif brace_start == nil then
+    min_start = curly_start
+  else
+    min_start = math.min(curly_start, brace_start)
+  end
+  if min_start == nil then
+    local res_str = res
+    if string.len(res) > 100 then
+      res_str = string.sub(res, 1, 100) .. "... [truncated]"
+    end
+    error("Could not find start curly brace or start brace in " .. language .. " shinylive response:\n" .. res_str)
+  end
+  if min_start > 1 then
+    res = string.sub(res, min_start)
+  end
+
   -- Decode JSON object
   local result
   local status, err = pcall(
