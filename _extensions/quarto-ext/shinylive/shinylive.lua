@@ -245,9 +245,10 @@ return {
       -- Convert code block to JSON string in the same format as app.json.
       local parsedCodeblockJson = pandoc.pipe(
         "quarto",
-        { "run", codeblockScript },
+        { "run", codeblockScript, language },
         el.text
       )
+
       -- This contains "files" and "quartoArgs" keys.
       local parsedCodeblock = quarto.json.decode(parsedCodeblockJson)
 
