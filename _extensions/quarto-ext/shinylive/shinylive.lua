@@ -1,10 +1,26 @@
+-- Notes:
+-- * 2023/10/04 - Barret:
+--   Always use `callShinyLive()` to call a shinylive extension.
+--   `callPythonShinyLive()` and `callRShinyLive()` should not be used directly.
+--   Instead, always use `callShinyLive()`.
+-- * 2023/10/04 - Barret:
+--   I could not get `error(msg)` to quit the current function execution and
+--   bubble up the stack and stop. Instead, I am using `assert(false, msg)` to
+--   achieve the desired behavior. Multi-line error messages should start with a
+--   `\n` to keep the message in the same readable area.
 
 
 
-
-local hasDoneSetup = { init = false, r = false, python = false }
+-- `table` to organize flags to have code only run once.
+local hasDoneSetup = { base = false, r = false, python = false, python_version = false }
+-- `table` to store `{ version, assets_version }` for each language's extension.
+-- If both `r` and `python` are used in the same document, then the
+-- `assets_version` for each language must be the same.
 local versions = { r = nil, python = nil }
+-- Global variable for the codeblock-to-json.js script file location
 local codeblockScript = nil
+-- Global hash table to store app specific dependencies to avoid calling
+-- `quarto.doc.attach_to_dependency()` multiple times for the same dependency.
 local appSpecificDeps = {}
 
 -- Python specific method to call py-shinylive
@@ -22,7 +38,7 @@ function callPythonShinylive(args, input)
 
   if not status then
     print(err)
-    error("Error running 'shinylive' command. Perhaps you need to install the 'shinylive' Python package?")
+    assert(false, "Error running 'shinylive' command. Perhaps you need to install the 'shinylive' Python package?")
   end
 
   return res
@@ -47,7 +63,7 @@ function callRShinylive(args, input)
 
   if not status then
     print(err)
-    error(
+    assert(false,
       "Error running 'Rscript' command. Perhaps you need to install the 'shinylive' R package?")
   end
 
@@ -68,7 +84,7 @@ function callShinylive(language, args, input)
   elseif language == "r" then
     res = callRShinylive(args, input)
   else
-    error("Unknown language: " .. language)
+    assert(false, "Unknown language: " .. language)
   end
 
   -- Remove any unwanted output before the first curly brace or square bracket.
@@ -88,7 +104,10 @@ function callShinylive(language, args, input)
     if string.len(res) > 100 then
       res_str = string.sub(res, 1, 100) .. "... [truncated]"
     end
-    error("Could not find start curly brace or start brace in " .. language .. " shinylive response:\n" .. res_str)
+    assert(false,
+      "\nCould not find start curly brace or start brace in " .. language .. " shinylive response:\n" ..
+      res_str
+    )
   end
   if min_start > 1 then
     res = string.sub(res, min_start)
@@ -106,15 +125,7 @@ function callShinylive(language, args, input)
     print(res)
     print("Error:")
     print(err)
-    if language == "python" then
-      error("Error decoding JSON response from shinylive.")
-    elseif language == "r" then
-      error(
-        "Error decoding JSON response from shinylive." ..
-        "\nIf the `shinylive` R package has been installed," ..
-        " please check that no additional output was printed to the console."
-      )
-    end
+    assert(false, "Error decoding JSON response from `shinylive` " .. language .. " package.")
   end
   return result
 end
@@ -122,11 +133,12 @@ end
 -- Do one-time setup for language agnostic html dependencies.
 -- This should only be called once per document
 -- @param language: "python" or "r"
-function ensureInitSetup(language)
-  if hasDoneSetup.init then
+function ensureBaseSetup(language)
+  -- Quit early if already done
+  if hasDoneSetup.base then
     return
   end
-  hasDoneSetup.init = true
+  hasDoneSetup.base = true
 
   -- Find the path to codeblock-to-json.ts and save it for later use.
   local infoObj = callShinylive(language, { "extension", "info" })
@@ -166,7 +178,7 @@ function ensureLanguageSetup(language)
     local infoObj = callShinylive(language, { "extension", "info" })
     versions[language] = { version = infoObj.version, assets_version = infoObj.assets_version }
   end
-  -- Verify that the r-shinylive and py-shinylive versions match
+  -- Verify that the r-shinylive and py-shinylive supported assets versions match
   if
       (versions.r and versions.python) and
       ---@diagnostic disable-next-line: undefined-field
@@ -200,7 +212,7 @@ function getShinyliveBaseDeps(language)
   -- Relative path from the current page to the root of the site. This is needed
   -- to find out where shinylive-sw.js is, relative to the current page.
   if quarto.project.offset == nil then
-    error("The shinylive extension must be used in a Quarto project directory (with a _quarto.yml file).")
+    assert(false, "The shinylive extension must be used in a Quarto project directory (with a _quarto.yml file).")
   end
   local deps = callShinylive(
     language,
