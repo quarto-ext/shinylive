@@ -23,6 +23,24 @@ local codeblockScript = nil
 -- `quarto.doc.attach_to_dependency()` multiple times for the same dependency.
 local appSpecificDeps = {}
 
+-- Display error message and throw error w/ short message
+-- @param msg: string Error message to be displayed
+-- @param short_msg: string Error message to be thrown
+function throw_quarto_error(err_msg, ...)
+  n = select("#", ...)
+  if n > 0 then
+    -- Display any meta information about the error
+    -- Add blank lines after msg for line separation for better readability
+    quarto.log.error(...)
+  else
+    quarto.log.error(err_msg .. "\n\n")
+  end
+  -- Add blank lines after short_msg for line separation for better readability
+  -- Use assert(false, msg) to quit the current function execution and
+  -- bubble up the stack and stop. Barret: I could not get this to work with `error(msg)`.
+  assert(false, err_msg .. "\n")
+end
+
 -- Python specific method to call py-shinylive
 -- @param args: list of string arguments to pass to py-shinylive
 -- @param input: string to pipe into to py-shinylive
@@ -37,8 +55,12 @@ function callPythonShinylive(args, input)
   )
 
   if not status then
-    print(err)
-    assert(false, "Error running 'shinylive' command. Perhaps you need to install the 'shinylive' Python package?")
+    throw_quarto_error(
+      "Error running 'shinylive' command. Perhaps you need to install / update the 'shinylive' Python package?",
+      "Error running 'shinylive' command. Perhaps you need to install / update the 'shinylive' Python package?\n",
+      "Error:\n",
+      err
+    )
   end
 
   return res
@@ -62,9 +84,12 @@ function callRShinylive(args, input)
   )
 
   if not status then
-    print(err)
-    assert(false,
-      "Error running 'Rscript' command. Perhaps you need to install the 'shinylive' R package?")
+    throw_quarto_error(
+      "Error running 'Rscript' command. Perhaps you need to install / update the 'shinylive' R package?",
+      "Error running 'Rscript' command. Perhaps you need to install / update the 'shinylive' R package?\n",
+      "Error:\n",
+      err
+    )
   end
 
   return res
@@ -82,13 +107,13 @@ function callShinylive(language, args, input, parseJson)
   end
 
   local res
-  -- print("Calling " .. language .. " shinylive with args: " .. table.concat(args, " "))
+  -- print("Calling " .. language .. " shinylive with args: ", args)
   if language == "python" then
     res = callPythonShinylive(args, input)
   elseif language == "r" then
     res = callRShinylive(args, input)
   else
-    assert(false, "Unknown language: " .. language)
+    throw_quarto_error("internal - Unknown language: " .. language)
   end
 
   if not parseJson then
@@ -112,8 +137,11 @@ function callShinylive(language, args, input, parseJson)
     if string.len(res) > 100 then
       res_str = string.sub(res, 1, 100) .. "... [truncated]"
     end
-    assert(false,
-      "\nCould not find start curly brace or start brace in " .. language .. " shinylive response:\n" ..
+    throw_quarto_error(
+      "Could not find start curly brace or start brace in " ..
+      language .. " shinylive response. Is JSON being returned from the " .. language .. " `shinylive` package?",
+      "Could not find start curly brace or start brace in " .. language .. " shinylive response.\n",
+      "JSON string being parsed:\n",
       res_str
     )
   end
@@ -130,11 +158,14 @@ function callShinylive(language, args, input, parseJson)
     end
   )
   if not status then
-    print("JSON string being parsed:")
-    print(res)
-    print("Error:")
-    print(err)
-    assert(false, "Error decoding JSON response from `shinylive` " .. language .. " package.")
+    throw_quarto_error(
+      "Error decoding JSON response from `shinylive` " .. language .. " package.",
+      "Error decoding JSON response from `shinylive` " .. language .. " package.\n",
+      "JSON string being parsed:\n",
+      res,
+      "Error:\n",
+      err
+    )
   end
   return result
 end
@@ -174,7 +205,7 @@ end
 -- If verA < verB, return -1
 function compareVersions(verA, verB)
   if verA.major == nil or verB.major == nil then
-    assert(false, "Invalid version: " .. verA.str .. " or " .. verB.str)
+    throw_quarto_error("Trying to compare an invalid version: " .. verA.str .. " or " .. verB.str)
   end
 
   for index, key in ipairs({ "major", "minor", "patch", "extra" }) do
@@ -232,8 +263,8 @@ function ensurePyshinyliveVersion(language)
       -- Major and minor values are 0. Ex: 0.0.18
       (parsedVersion.major == 0 and parsedVersion.minor == 0)
   then
-    assert(nil,
-      "\nThe shinylive Python package must be at least version v0.1.0 to be used in a quarto document." ..
+    assert(false,
+      "\nThe shinylive Python package must be at least version v0.1.0 to be used in a Quarto document." ..
       "\n\nInstalled Python Shinylive package version: " .. pyShinyliveVersion ..
       "\n\nPlease upgrade the Python Shinylive package by running:" ..
       "\n\tpip install --upgrade shinylive" ..
@@ -317,24 +348,26 @@ function ensureLanguageSetup(language)
           "therefore we recommend updating your R shinylive package to the latest version."
     end
 
-    assert(false,
-      "\nThe shinylive R and Python packages must support the same Shinylive Assets version to be used in the same quarto document." ..
-      "\n" ..
-      "\nPython shinylive package version: " ..
+    throw_quarto_error(
+      "The shinylive R and Python packages must support the same Shinylive Assets version to be used in the same Quarto document.",
+      "The shinylive R and Python packages must support the same Shinylive Assets version to be used in the same Quarto document.\n",
+      "\n",
+      "Python shinylive package version: ",
       ---@diagnostic disable-next-line: undefined-field
-      versions.python.version .. " ; Supported assets version: " .. versions.python.assets_version ..
-      "\nR shinylive package version:      " ..
+      versions.python.version .. " ; Supported assets version: " .. versions.python.assets_version .. "\n",
+      "R shinylive package version:       " ..
       ---@diagnostic disable-next-line: undefined-field
-      versions.r.version .. " ; Supported assets version: " .. versions.r.assets_version ..
-      "\n" ..
-      "\n" .. verDiffStr ..
-      "\n" ..
-      "\nTo update your R Shinylive package, run:" ..
-      "\n\tR -e \"install.packages('shinylive')\"" ..
-      "\n" ..
-      "\nTo update your Python Shinylive package, run:" ..
-      "\n\tpip install --upgrade shinylive" ..
-      "\n(If you are using a virtual environment, please activate it before running the command above.)"
+      versions.r.version .. " ; Supported assets version: " .. versions.r.assets_version .. "\n",
+      "\n",
+      verDiffStr .. "\n",
+      "\n",
+      "To update your R Shinylive package, run:\n",
+      "\tR -e \"install.packages('shinylive')\"\n",
+      "\n",
+      "To update your Python Shinylive package, run:\n",
+      "\tpip install --upgrade shinylive\n",
+      "(If you are using a virtual environment, please activate it before running the command above.)\n",
+      "\n"
     )
   end
 
@@ -351,7 +384,7 @@ function getShinyliveBaseDeps(language)
   -- Relative path from the current page to the root of the site. This is needed
   -- to find out where shinylive-sw.js is, relative to the current page.
   if quarto.project.offset == nil then
-    assert(false, "The shinylive extension must be used in a Quarto project directory (with a _quarto.yml file).")
+    throw_quarto_error("The `shinylive` extension must be used in a Quarto project directory (with a _quarto.yml file).")
   end
   local deps = callShinylive(
     language,
