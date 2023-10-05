@@ -10,7 +10,6 @@
 --   `\n` to keep the message in the same readable area.
 
 
-
 -- `table` to organize flags to have code only run once.
 local hasDoneSetup = { base = false, r = false, python = false, python_version = false }
 -- `table` to store `{ version, assets_version }` for each language's extension.
