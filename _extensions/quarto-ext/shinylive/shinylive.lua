@@ -1,4 +1,7 @@
 -- Notes:
+-- * 2024/05/03 - Christophe:
+--   `quarto run` needs to be called using the same quarto CLI that called the extension.
+--   This is done by using `quarto.cli_path` from Quarto 1.5 Lua API.
 -- * 2023/10/04 - Barret:
 --   Always use `callShinyLive()` to call a shinylive extension.
 --   `callPythonShinyLive()` and `callRShinyLive()` should not be used directly.
@@ -415,7 +418,8 @@ return {
 
       -- Convert code block to JSON string in the same format as app.json.
       local parsedCodeblockJson = pandoc.pipe(
-        "quarto",
+        -- Use quarto binary that called this extension 
+        quarto.config.cli_path(),
         { "run", codeblockScript, language },
         el.text
       )
