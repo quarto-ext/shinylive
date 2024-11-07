@@ -19,14 +19,12 @@ import matplotlib.pyplot as plt
 
 app_ui = ui.page_fluid(
     ui.layout_sidebar(
-        ui.panel_sidebar(
+        ui.sidebar(
             ui.input_slider("period", "Period", 0.5, 2, 1, step=0.5),
             ui.input_slider("amplitude", "Amplitude", 0, 2, 1, step=0.25),
             ui.input_slider("shift", "Phase shift", 0, 2, 0, step=0.1),
         ),
-        ui.panel_main(
-            ui.output_plot("plot"),
-        ),
+        ui.output_plot("plot"),
     ),
 )
 
